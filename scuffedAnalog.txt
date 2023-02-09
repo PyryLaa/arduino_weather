@@ -3,39 +3,39 @@ float wind_direction = analogRead(A4):
       if(wind_direction > 0 && wind_direction < 0.47){
         lcd.setCursor(7,1);
         lcd.print(N);
-        Serial.print("N ")
+        Serial.print("N ");
       }
       if(wind_direction > 0.47 && wind_direction < 0.95){
         lcd.setCursor(7,1);
         lcd.print(NE);
-        Serial.print("NE ")
+        Serial.print("NE ");
       }
       if(wind_direction > 0.95 && wind_direction < 0.95){
         lcd.setCursor(7,1);
         lcd.print(E);
-        Serial.print("E ")
+        Serial.print("E ");
       }
       if(wind_direction > 1.43 && wind_direction < 1.9){
         lcd.setCursor(7,1);
         lcd.print(SE);
-        Serial.print("SE ")
+        Serial.print("SE ");
       }
       if(wind_direction > 1.9 && wind_direction < 2.38){
         lcd.setCursor(7,1);
         lcd.print(S);
-        Serial.print("S ")
+        Serial.print("S ");
       }
       if(wind_direction > 2.38 && wind_direction < 2.85){
         lcd.setCursor(7,1);
         lcd.print(SW);
-        Serial.print("SW ")
+        Serial.print("SW ");
       }if(wind_direction > 2.85 && wind_direction < 3.33){
         lcd.setCursor(7,1);
         lcd.print(W);
-        Serial.print("W ")
+        Serial.print("W ");
       }
        if(wind_direction > 3.33){
         lcd.setCursor(7,1);
         lcd.print(NW);
-        Serial.print("NW ")
+        Serial.print("NW ");
       }
