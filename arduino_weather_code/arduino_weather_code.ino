@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 #include <TimerOne.h>
 
-const int speed_pin = 2;
+const int speed_pin = 2; //Pin for wind speed signal
 /*attachInterrupt(0, pulse_counter, RISING);
 Timer1.intialize(5000000);
 Timer1.attachInterrupt(Timer_int_routine);*/
@@ -11,11 +11,11 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);//Define the lcd display as "lcd" and 
 const int buttonPins[4] = {A0, A1, A2, A3};//Button pins for keypad inputs
 
 bool tm = false;
-int buttonState = 0;
+int buttonState = 0; //Button state of keypad buttons
 
 
-volatile int step_counter = 0;
-volatile int freq = 0;
+volatile int step_counter = 0; //Counter for rising edges of wind speed signal
+volatile int freq = 0; //Frequency of wind speed signal
 
 int wind_speed = 0;
 
@@ -24,7 +24,7 @@ void Timer_int_routine();
 void pulse_counter();
 
 void setup() {
-  attachInterrupt(0, pulse_counter, RISING);
+  attachInterrupt(digitalPinToInterrupt(2), pulse_counter, RISING);
   Timer1.initialize(5000000);
   Timer1.attachInterrupt(Timer_int_routine);
   lcd.begin(20,4);
@@ -56,10 +56,10 @@ void loop() {
   lcd.print(analogRead(A4));
       
   if(wind_direction >= 0 && wind_direction < 0.47){
+    lcd.clear();
     lcd.setCursor(7,1);
     lcd.print("N ");
     Serial.print("N ");
-    lcd.clear();
   }
   else if(wind_direction > 0.47 && wind_direction < 0.95){
     lcd.clear();
@@ -114,9 +114,7 @@ void testmode(){
   lcd.setCursor(18, 3);
   lcd.print("TM");
   lcd.setCursor(0, 0);
-  lcd.print("nopeus:");
-  lcd.setCursor(7, 0);
-  lcd.print(wind_speed);
+  lcd.print("nopeus:" + wind_speed + "m/s");
   lcd.setCursor(0, 1);
   lcd.print("suunta: ");
   
@@ -124,10 +122,10 @@ void testmode(){
   lcd.clear();
 }
 
-void pulse_counter(){
+void pulse_counter(){ //Interrupt routine, increments the step counter which counts the rising edges of wind speed signal
   step_counter++;
 }
-void Timer_int_routine(){
+void Timer_int_routine(){ //This happens every 5 seconds, counts the frequency of wind speed signal
   freq = step_counter/5;
   step_counter = 0;
 }
