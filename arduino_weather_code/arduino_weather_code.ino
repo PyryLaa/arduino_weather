@@ -18,6 +18,7 @@ volatile int step_counter = 0; //Counter for rising edges of wind speed signal
 volatile int freq = 0; //Frequency of wind speed signal
 
 int wind_speed = 0;
+int sensor_value = 0;
 
 void testmode();
 void Timer_int_routine();
@@ -57,11 +58,14 @@ void loop() {
       testmode();
     }
   }
-  float wind_direction = (analogRead(A4) / 1024)*5;
-  //lcd.print(analogRead(A4));
+  sensor_value = analogRead(A4);
+  float wind_direction = sensor_value*(5/1023.0);
+  
       
   if(wind_direction >= 0 && wind_direction < 0.47){
     lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(wind_direction);
     lcd.setCursor(7,1);
     lcd.print("N ");
     Serial.print("N ");
@@ -69,6 +73,8 @@ void loop() {
   }
   else if(wind_direction > 0.47 && wind_direction < 0.95){
     lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(wind_direction);
     lcd.setCursor(7,1);
     lcd.print("NE");
     Serial.print("NE ");
@@ -76,6 +82,8 @@ void loop() {
   }
   else if(wind_direction > 0.95 && wind_direction < 0.95){
     lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(wind_direction);
     lcd.setCursor(7,1);
     lcd.print("E ");
     Serial.print("E ");
@@ -83,6 +91,8 @@ void loop() {
   }
   else if(wind_direction > 1.43 && wind_direction < 1.9){
     lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(wind_direction);
     lcd.setCursor(7,1);
     lcd.print("SE");
     Serial.print("SE ");
@@ -90,6 +100,8 @@ void loop() {
   }
   else if(wind_direction > 1.9 && wind_direction < 2.38){
     lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(wind_direction);
     lcd.setCursor(7,1);
     lcd.print("S ");
     Serial.print("S ");
@@ -97,12 +109,16 @@ void loop() {
   }
   else if(wind_direction > 2.38 && wind_direction < 2.85){
     lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(wind_direction);
     lcd.setCursor(7,1);
     lcd.print("SW");
     Serial.print("SW ");
     delay(500);
   }else if(wind_direction > 2.85 && wind_direction < 3.33){
     lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(wind_direction);
     lcd.setCursor(7,1);
     lcd.print("W ");
     Serial.print("W ");
@@ -110,6 +126,8 @@ void loop() {
   }
   else if(wind_direction > 3.33){
     lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(wind_direction);
     lcd.setCursor(7,1);
     lcd.print("NW");
     Serial.print("NW ");
