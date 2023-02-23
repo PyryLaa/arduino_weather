@@ -2,9 +2,7 @@
 #include <TimerOne.h>
 
 const int speed_pin = 2; //Pin for wind speed signal
-/*attachInterrupt(0, pulse_counter, RISING);
-Timer1.intialize(5000000);
-Timer1.attachInterrupt(Timer_int_routine);*/
+
 
 const int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3; //LCD display pins
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);//Define the lcd display as "lcd" and the pins
@@ -20,6 +18,10 @@ volatile int freq = 0; //Frequency of wind speed signal
 int wind_speed = 0;
 int sensor_value = 0;
 
+char alphabet = 65;
+const int MAX_ASCII = 122;
+int a = 0, b = 0;
+
 void testmode();
 void Timer_int_routine();
 void pulse_counter();
@@ -29,6 +31,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(2), pulse_counter, RISING);
   Timer1.initialize(3000000);
   Timer1.attachInterrupt(Timer_int_routine);
+
   lcd.begin(20,4);
   pinMode(speed_pin, INPUT);
   Serial.begin(9600);
@@ -51,6 +54,9 @@ void loop() {
     if (buttonState == LOW && buttonPins[i] == A0){
       
       tm = true;
+    }
+    if (buttonState == LOW && buttonPins[i] == A3){
+      running_alphabet();
     }
 
     if (tm == true){
@@ -229,4 +235,72 @@ void Timer_int_routine(){ //This happens every 3 seconds, counts the frequency o
   freq = step_counter/3;
   wind_speed = -0.24 + freq * 0.699;
   step_counter = 0;
+}
+
+
+
+void running_alphabet(){
+  while (a < 20){
+    if (alphabet == 123){
+      alphabet = 65;
+    }
+    if (alphabet == 91){
+      alphabet = 97;
+    }
+    lcd.clear();
+    lcd.setCursor(a, b);
+    lcd.print(alphabet);
+    alphabet++;
+    a++;
+    delay(200);
+  }
+  b++;
+  while (a > 0){
+    if (alphabet == 123){
+      alphabet = 65;
+    }
+    if (alphabet == 91){
+      alphabet = 97;
+    }
+    a--;
+    lcd.clear();
+    lcd.setCursor(a, b);
+    lcd.print(alphabet);
+    alphabet++;
+    
+    delay(200);
+  }
+  b++;
+  while (a < 20){
+    if (alphabet == 123){
+      alphabet = 65;
+    }
+    if (alphabet == 91){
+      alphabet = 97;
+    }
+    lcd.clear();
+    lcd.setCursor(a, b);
+    lcd.print(alphabet);
+    alphabet++;
+    a++;
+    delay(200);
+  }
+  b++;
+  while (a > 0){
+    if (alphabet == 123){
+      alphabet = 65;
+    }
+    if (alphabet == 91){
+      alphabet = 97;
+    }
+    a--;
+    lcd.clear();
+    lcd.setCursor(a, b);
+    lcd.print(alphabet);
+    alphabet++;
+    
+    delay(200);
+  }
+  b = 0;
+  
 }
