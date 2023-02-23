@@ -1,5 +1,10 @@
 #include <LiquidCrystal.h>
 #include <TimerOne.h>
+#include <Ethernet.h>
+#include <PubSubClient.h>
+#define outTopic "alykkaat Topic"
+
+
 
 const int speed_pin = 2; //Pin for wind speed signal
 
@@ -7,6 +12,7 @@ const int speed_pin = 2; //Pin for wind speed signal
 const int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3; //LCD display pins
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);//Define the lcd display as "lcd" and the pins
 const int buttonPins[4] = {A0, A1, A2, A3};//Button pins for keypad inputs
+
 
 bool tm = false;
 int buttonState = 0; //Button state of keypad buttons
@@ -26,6 +32,12 @@ void testmode();
 void Timer_int_routine();
 void pulse_counter();
 
+EthernetClient ethClient;
+char bufa[15] = "Alykkaat Data";
+byte server[] = {10, 6, 0, 20};
+void callback(char* topic, byte* payload, unsigned int length);
+PubSubClient client (server, 1883, callback, ethClient);
+
 
 void setup() {
   attachInterrupt(digitalPinToInterrupt(2), pulse_counter, RISING);
@@ -37,6 +49,9 @@ void setup() {
   Serial.begin(9600);
   pinMode(A4, INPUT);
 
+  static uint8_t mymac[6] = {0x11,0xFC,0xD6,0x05,0x97,0x4C};
+  //Ethernet.begin(mymac);
+
   for (int i = 0; i < 4; i++){
     pinMode(buttonPins[i], INPUT_PULLUP);
   };
@@ -44,6 +59,15 @@ void setup() {
   lcd.print("Wind speed: ");
   lcd.setCursor(0, 1);
   lcd.print("Direction: ");
+
+  
+
+  char* deviceId = "2023PJS420";
+  char* clientId = "8481024";
+  char* deviceSecret = "tamk";  
+
+  client.connect(clientId, deviceId, deviceSecret);
+  
 }
 
 void loop() {
@@ -65,10 +89,12 @@ void loop() {
   }
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
+  //lcd.setCursor(0,2);
+  //lcd.print(Ethernet.localIP());
   
   lcd.setCursor(12,0);
   lcd.print(wind_speed);
-  lcd.print(" m/s");
+  lcd.print(" m/s ");
       
   if(wind_direction >= 0 && wind_direction < 0.47){
     
@@ -135,6 +161,8 @@ void loop() {
     delay(500);
   }
 
+  client.publish(outTopic, bufa);
+
 }
 
 
@@ -148,7 +176,7 @@ void testmode(){
     lcd.setCursor(0, 0);
     lcd.print("Wind speed: ");
     lcd.print(wind_speed);
-    lcd.print(" m/s");
+    lcd.print(" m/s ");
     lcd.setCursor(0,1);
     lcd.print("Direction: ");
 
@@ -240,6 +268,7 @@ void Timer_int_routine(){ //This happens every 3 seconds, counts the frequency o
 
 
 void running_alphabet(){
+  while (true){
   while (a < 20){
     if (alphabet == 123){
       alphabet = 65;
@@ -302,5 +331,11 @@ void running_alphabet(){
     delay(200);
   }
   b = 0;
-  
 }
+}
+
+void callback(char* topic, byte* payload, unsigned int length){
+  char* received_topic = topic;
+  byte received_payload = payload;
+  unsigned int received_length = length;
+  }
