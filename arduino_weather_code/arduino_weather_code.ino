@@ -37,8 +37,10 @@ void setup() {
   for (int i = 0; i < 4; i++){
     pinMode(buttonPins[i], INPUT_PULLUP);
   };
-  
-
+  lcd.setCursor(0, 0);
+  lcd.print("Wind speed: ");
+  lcd.setCursor(0, 1);
+  lcd.print("Direction: ");
 }
 
 void loop() {
@@ -50,9 +52,6 @@ void loop() {
       
       tm = true;
     }
-    if (buttonState == LOW && buttonPins[i] == A1){
-      wind_speed_func();      
-    }
 
     if (tm == true){
       testmode();
@@ -61,76 +60,72 @@ void loop() {
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
   
+  lcd.setCursor(12,0);
+  lcd.print(wind_speed);
+  lcd.print(" m/s");
       
   if(wind_direction >= 0 && wind_direction < 0.47){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(wind_direction);
-    lcd.setCursor(7,1);
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
     lcd.print("N ");
-    Serial.print("N ");
     delay(500);
   }
   else if(wind_direction > 0.47 && wind_direction < 0.95){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(wind_direction);
-    lcd.setCursor(7,1);
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
     lcd.print("NE");
-    Serial.print("NE ");
     delay(500);
   }
   else if(wind_direction > 0.95 && wind_direction < 0.95){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(wind_direction);
-    lcd.setCursor(7,1);
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
     lcd.print("E ");
-    Serial.print("E ");
     delay(500);
   }
   else if(wind_direction > 1.43 && wind_direction < 1.9){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(wind_direction);
-    lcd.setCursor(7,1);
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
     lcd.print("SE");
-    Serial.print("SE ");
     delay(500);
   }
   else if(wind_direction > 1.9 && wind_direction < 2.38){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(wind_direction);
-    lcd.setCursor(7,1);
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
     lcd.print("S ");
-    Serial.print("S ");
     delay(500);
   }
   else if(wind_direction > 2.38 && wind_direction < 2.85){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(wind_direction);
-    lcd.setCursor(7,1);
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
     lcd.print("SW");
-    Serial.print("SW ");
     delay(500);
-  }else if(wind_direction > 2.85 && wind_direction < 3.33){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(wind_direction);
-    lcd.setCursor(7,1);
+  }
+  else if(wind_direction > 2.85 && wind_direction < 3.33){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
     lcd.print("W ");
-    Serial.print("W ");
     delay(500);
   }
   else if(wind_direction > 3.33){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(wind_direction);
-    lcd.setCursor(7,1);
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
     lcd.print("NW");
-    Serial.print("NW ");
     delay(500);
   }
 
@@ -145,33 +140,93 @@ void testmode(){
     lcd.setCursor(18, 3);
     lcd.print("TM");
     lcd.setCursor(0, 0);
-    lcd.print("nopeus:");
+    lcd.print("Wind speed: ");
     lcd.print(wind_speed);
-    lcd.print("m/s");
-    lcd.setCursor(0, 1);
-    lcd.print("suunta: ");
+    lcd.print(" m/s");
+    lcd.setCursor(0,1);
+    lcd.print("Direction: ");
+
+    sensor_value = analogRead(A4);
+    float wind_direction = sensor_value*(5/1023.0);
+
+    if(wind_direction >= 0 && wind_direction < 0.47){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
+    lcd.print("N ");
+    delay(500);
+  }
+  else if(wind_direction > 0.47 && wind_direction < 0.95){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
+    lcd.print("NE");
+    delay(500);
+  }
+  else if(wind_direction > 0.95 && wind_direction < 0.95){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
+    lcd.print("E ");
+    delay(500);
+  }
+  else if(wind_direction > 1.43 && wind_direction < 1.9){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
+    lcd.print("SE");
+    delay(500);
+  }
+  else if(wind_direction > 1.9 && wind_direction < 2.38){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
+    lcd.print("S ");
+    delay(500);
+  }
+  else if(wind_direction > 2.38 && wind_direction < 2.85){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
+    lcd.print("SW");
+    delay(500);
+  }
+  else if(wind_direction > 2.85 && wind_direction < 3.33){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
+    lcd.print("W ");
+    delay(500);
+  }
+  else if(wind_direction > 3.33){
+    
+    lcd.setCursor(11,1);
+    /*lcd.print(wind_direction);
+    lcd.setCursor(7,1);*/
+    lcd.print("NW");
+    delay(500);
+  }
+    
     
     delay(1000);
     lcd.clear();
   }
-}
-void wind_speed_func(){
-  while(true){
 
-    wind_speed = -0.24 + freq * 0.699;
-    lcd.setCursor(3, 0);
-    lcd.print("Tuulen nopeus");
-    lcd.setCursor(8,1);
-    lcd.print(wind_speed);
-    lcd.print("m/s");
-    delay(1000);
-    lcd.clear();
-  }
 }
+
+
 void pulse_counter(){ //Interrupt routine, increments the step counter which counts the rising edges of wind speed signal
   step_counter++;
 }
-void Timer_int_routine(){ //This happens every 5 seconds, counts the frequency of wind speed signal
+void Timer_int_routine(){ //This happens every 3 seconds, counts the frequency of wind speed signal
   freq = step_counter/3;
+  wind_speed = -0.24 + freq * 0.699;
   step_counter = 0;
 }
