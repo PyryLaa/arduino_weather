@@ -2,7 +2,9 @@
 #include <TimerOne.h>
 #include <Ethernet.h>
 #include <PubSubClient.h>
-#define outTopic "alykkaat Topic"
+#include <SPI.h>
+#define outTopic "alykkaat2k23 Topic"
+#define  mac_6    0x73 
 
 
 
@@ -33,11 +35,15 @@ void Timer_int_routine();
 void pulse_counter();
 
 EthernetClient ethClient;
+
 char bufa[15] = "Alykkaat Data";
 byte server[] = {10, 6, 0, 20};
-void callback(char* topic, byte* payload, unsigned int length);
-PubSubClient client (server, 1883, callback, ethClient);
+//void callback(char* topic, byte* payload, unsigned int length);
+//PubSubClient client (server, 1883, callback, ethClient);
 
+//const byte my_ip[] = {192, 168, 112, 89};
+
+static uint8_t mymac[6] = { 0x44,0x76,0x58,0x10,0x00,mac_6 };
 
 void setup() {
   attachInterrupt(digitalPinToInterrupt(2), pulse_counter, RISING);
@@ -49,8 +55,9 @@ void setup() {
   Serial.begin(9600);
   pinMode(A4, INPUT);
 
-  static uint8_t mymac[6] = {0x11,0xFC,0xD6,0x05,0x97,0x4C};
-  //Ethernet.begin(mymac);
+
+  
+  
 
   for (int i = 0; i < 4; i++){
     pinMode(buttonPins[i], INPUT_PULLUP);
@@ -59,14 +66,14 @@ void setup() {
   lcd.print("Wind speed: ");
   lcd.setCursor(0, 1);
   lcd.print("Direction: ");
-
+  Ethernet.begin( mymac);
   
 
   char* deviceId = "2023PJS420";
   char* clientId = "8481024";
   char* deviceSecret = "tamk";  
-
-  client.connect(clientId, deviceId, deviceSecret);
+  
+  //client.connect(clientId, deviceId, deviceSecret);
   
 }
 
@@ -89,8 +96,9 @@ void loop() {
   }
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
-  //lcd.setCursor(0,2);
-  //lcd.print(Ethernet.localIP());
+  lcd.setCursor(0,2);
+  lcd.print(Ethernet.localIP());
+  
   
   lcd.setCursor(12,0);
   lcd.print(wind_speed);
@@ -161,7 +169,7 @@ void loop() {
     delay(500);
   }
 
-  client.publish(outTopic, bufa);
+  //client.publish(outTopic, bufa);
 
 }
 
@@ -338,4 +346,5 @@ void callback(char* topic, byte* payload, unsigned int length){
   char* received_topic = topic;
   byte received_payload = payload;
   unsigned int received_length = length;
-  }
+}
+
