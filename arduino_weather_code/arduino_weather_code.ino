@@ -4,7 +4,7 @@
 #include <PubSubClient.h>
 #include <SPI.h>
 #define outTopic "alykkaat2k23 Topic"
-#define  mac_6    0x73 
+#define  mac_6    0x32 
 
 
 
@@ -36,16 +36,17 @@ void pulse_counter();
 
 EthernetClient ethClient;
 
-char bufa[15] = "Alykkaat Data";
-byte server[] = {10, 6, 0, 20};
+
+byte server[] = {10, 6, 0, 20}; //Server IP address
 //void callback(char* topic, byte* payload, unsigned int length);
 //PubSubClient client (server, 1883, callback, ethClient);
 
 //const byte my_ip[] = {192, 168, 112, 89};
 
-static uint8_t mymac[6] = { 0x44,0x76,0x58,0x10,0x00,mac_6 };
+static uint8_t mymac[6] = { 0x44,0x76,0x58,0x10,0x00,mac_6 }; //Mac address for ethernet module
 
 void setup() {
+
   attachInterrupt(digitalPinToInterrupt(2), pulse_counter, RISING);
   Timer1.initialize(3000000);
   Timer1.attachInterrupt(Timer_int_routine);
@@ -56,9 +57,6 @@ void setup() {
   pinMode(A4, INPUT);
 
 
-  
-  
-
   for (int i = 0; i < 4; i++){
     pinMode(buttonPins[i], INPUT_PULLUP);
   };
@@ -66,7 +64,6 @@ void setup() {
   lcd.print("Wind speed: ");
   lcd.setCursor(0, 1);
   lcd.print("Direction: ");
-  Ethernet.begin( mymac);
   
 
   char* deviceId = "2023PJS420";
@@ -94,10 +91,10 @@ void loop() {
       testmode();
     }
   }
+
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
-  lcd.setCursor(0,2);
-  lcd.print(Ethernet.localIP());
+  
   
   
   lcd.setCursor(12,0);
@@ -107,64 +104,56 @@ void loop() {
   if(wind_direction >= 0 && wind_direction < 0.47){
     
     lcd.setCursor(11,1);
-    /*lcd.print(wind_direction);
-    lcd.setCursor(7,1);*/
+    
     lcd.print("N ");
     delay(500);
   }
   else if(wind_direction > 0.47 && wind_direction < 0.95){
     
     lcd.setCursor(11,1);
-    /*lcd.print(wind_direction);
-    lcd.setCursor(7,1);*/
+    
     lcd.print("NE");
     delay(500);
   }
   else if(wind_direction > 0.95 && wind_direction < 0.95){
     
     lcd.setCursor(11,1);
-    /*lcd.print(wind_direction);
-    lcd.setCursor(7,1);*/
+    
     lcd.print("E ");
     delay(500);
   }
   else if(wind_direction > 1.43 && wind_direction < 1.9){
     
     lcd.setCursor(11,1);
-    /*lcd.print(wind_direction);
-    lcd.setCursor(7,1);*/
+    
     lcd.print("SE");
     delay(500);
   }
   else if(wind_direction > 1.9 && wind_direction < 2.38){
     
     lcd.setCursor(11,1);
-    /*lcd.print(wind_direction);
-    lcd.setCursor(7,1);*/
+    
     lcd.print("S ");
     delay(500);
   }
   else if(wind_direction > 2.38 && wind_direction < 2.85){
     
     lcd.setCursor(11,1);
-    /*lcd.print(wind_direction);
-    lcd.setCursor(7,1);*/
+    
     lcd.print("SW");
     delay(500);
   }
   else if(wind_direction > 2.85 && wind_direction < 3.33){
     
     lcd.setCursor(11,1);
-    /*lcd.print(wind_direction);
-    lcd.setCursor(7,1);*/
+    
     lcd.print("W ");
     delay(500);
   }
   else if(wind_direction > 3.33){
     
     lcd.setCursor(11,1);
-    /*lcd.print(wind_direction);
-    lcd.setCursor(7,1);*/
+    
     lcd.print("NW");
     delay(500);
   }
@@ -277,69 +266,85 @@ void Timer_int_routine(){ //This happens every 3 seconds, counts the frequency o
 
 void running_alphabet(){
   while (true){
-  while (a < 20){
-    if (alphabet == 123){
-      alphabet = 65;
+    while (a < 20){
+      if (alphabet == 123){
+        alphabet = 65;
+      }
+      if (alphabet == 91){
+        alphabet = 97;
+      }
+      lcd.clear();
+      lcd.setCursor(a, b);
+      lcd.print(alphabet);
+      alphabet++;
+      a++;
+      delay(200);
     }
-    if (alphabet == 91){
-      alphabet = 97;
+    b++;
+    while (a > 0){
+      if (alphabet == 123){
+        alphabet = 65;
+      }
+      if (alphabet == 91){
+        alphabet = 97;
+      }
+      a--;
+      lcd.clear();
+      lcd.setCursor(a, b);
+      lcd.print(alphabet);
+      alphabet++;
+      
+      delay(200);
     }
-    lcd.clear();
-    lcd.setCursor(a, b);
-    lcd.print(alphabet);
-    alphabet++;
-    a++;
-    delay(200);
+    b++;
+    while (a < 20){
+      if (alphabet == 123){
+        alphabet = 65;
+      }
+      if (alphabet == 91){
+        alphabet = 97;
+      }
+      lcd.clear();
+      lcd.setCursor(a, b);
+      lcd.print(alphabet);
+      alphabet++;
+      a++;
+      delay(200);
+    }
+    b++;
+    while (a > 0){
+      if (alphabet == 123){
+        alphabet = 65;
+      }
+      if (alphabet == 91){
+        alphabet = 97;
+      }
+      a--;
+      lcd.clear();
+      lcd.setCursor(a, b);
+      lcd.print(alphabet);
+      alphabet++;
+      
+      delay(200);
+    }
+    b = 0;
   }
-  b++;
-  while (a > 0){
-    if (alphabet == 123){
-      alphabet = 65;
-    }
-    if (alphabet == 91){
-      alphabet = 97;
-    }
-    a--;
-    lcd.clear();
-    lcd.setCursor(a, b);
-    lcd.print(alphabet);
-    alphabet++;
-    
-    delay(200);
-  }
-  b++;
-  while (a < 20){
-    if (alphabet == 123){
-      alphabet = 65;
-    }
-    if (alphabet == 91){
-      alphabet = 97;
-    }
-    lcd.clear();
-    lcd.setCursor(a, b);
-    lcd.print(alphabet);
-    alphabet++;
-    a++;
-    delay(200);
-  }
-  b++;
-  while (a > 0){
-    if (alphabet == 123){
-      alphabet = 65;
-    }
-    if (alphabet == 91){
-      alphabet = 97;
-    }
-    a--;
-    lcd.clear();
-    lcd.setCursor(a, b);
-    lcd.print(alphabet);
-    alphabet++;
-    
-    delay(200);
-  }
-  b = 0;
+
 }
+
+
+void fetch_IP(){ //Get ip address for ethernet module
+  byte result = 1;
+
+  result = Ethernet.begin( mymac);
+  if (result == 0){
+    lcd.setCursor(0,2);
+    lcd.print("IP fail");
+  }
+  else{
+  lcd.setCursor(0,2);
+  lcd.print(Ethernet.localIP());
+  }
 }
 
 void callback(char* topic, byte* payload, unsigned int length){
