@@ -1,9 +1,6 @@
 #include <LiquidCrystal.h>
 
-
-// initialize the library by associating any needed LCD interface pin
-// with the arduino pin number it is connected to
-const int buttonPinLeft = A3;
+const int buttonPinLeft = A5;
 const int buttonPinRight = A2;
 const int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
@@ -14,28 +11,41 @@ int juoksevaNumero = 19; //number to get files moving
 int score = 0;
 int hahmoPaikkaY = 0;
 int hahmoPaikkaX = 0;
+int aloitus = 0;
 
-// variables will change:
-int buttonStateLeft = HIGH;         // variable for reading the pushbutton status
+
+int buttonStateLeft = HIGH;        
 int buttonStateRight = HIGH;
 int lastButtonStateLeft = 0;
 int lastButtonStateRight = 0;
 void setup() {
-  pinMode(A3, INPUT);
-  pinMode(A2, INPUT);
-  // initialize the Serial Monitor @ 9600
+  pinMode(A5, INPUT);
   Serial.begin(9600);  
-  // initialize the keypad pin(s) as an input:
   lcd.begin(20,4);
 }
 
 void loop(){
+
+  if(aloitus == 0){
+    lcd.setCursor(2,2);
+    lcd.print("Starting: 3");
+    delay(1000);
+    
+    lcd.print("2");
+    delay(1000);
+    
+    lcd.print("1 Go!");
+    delay(1000);
+    lcd.clear();
+
+    aloitus = 1;
+    }
  
   
   lcd.setCursor(juoksevaNumero, satunnainenNumero);
   lcd.print("** ");
   juoksevaNumero--;
-  delay(50);
+  delay(20);
   
   
   
@@ -76,11 +86,8 @@ void loop(){
       }
 
 
-
-  
    buttonStateLeft = digitalRead(buttonPinLeft);
-   buttonStateRight = digitalRead(buttonPinRight);
-   //Serial.print(digitalRead(A7));
+
     
       if (buttonStateLeft != lastButtonStateLeft){
         if (buttonStateLeft == HIGH) {    
@@ -90,22 +97,8 @@ void loop(){
         hahmoPaikkaY--;
 
 
-       }}
-
+     }}
   
-    if(buttonStateRight != lastButtonStateRight){
-       if (buttonStateRight == HIGH) {
-          Serial.print('3');
-          lcd.clear();
-          delay(20);
-          hahmoPaikkaY++;
- 
-        }}
-        
-
-      lastButtonStateLeft = buttonStateLeft;
-      lastButtonStateRight = buttonStateRight;
-
+   lastButtonStateLeft = buttonStateLeft;
 
      }
-
