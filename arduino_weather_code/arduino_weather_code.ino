@@ -60,7 +60,7 @@ void Connect_MQTT_server();
 void send_MQTT_message();
 
 void setup() {
-  pinMode(A6, OUTPUT);
+  pinMode(9, OUTPUT);
   pinMode(A5, INPUT);
   attachInterrupt(digitalPinToInterrupt(2), pulse_counter, RISING);
   Timer1.initialize(3000000);
