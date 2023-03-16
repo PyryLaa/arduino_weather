@@ -104,6 +104,14 @@ void loop() {
     if (tm == true){
       testmode();
     }
+    if (buttonState == LOW && buttonPins[i] == A1){
+      
+      peli();
+    }
+    if (buttonState == LOW && buttonPins[i] == A2){
+      
+      ee();
+    }
   }
 
   
@@ -358,3 +366,112 @@ void running_alphabet(){//Surprise
   }
 
 }
+
+void peli(){
+
+  lcd.clear();
+
+int satunnainenNumero = 0; //random number for game
+int juoksevaNumero = 19; //number to get files moving
+int score = 0;
+int hahmoPaikkaY = 0;
+int hahmoPaikkaX = 0;
+int aloitus = 0;
+int buttonStateLeft = HIGH;        
+int buttonStateRight = HIGH;
+int lastButtonStateLeft = 0;
+int lastButtonStateRight = 0;
+
+  while(true){
+  
+  if(aloitus == 0){
+    lcd.setCursor(2,2);
+    lcd.print("Starting: 3");
+    delay(1000);
+    
+    lcd.print("2");
+    delay(1000);
+    
+    lcd.print("1 Go!");
+    delay(1000);
+    lcd.clear();
+
+    aloitus = 1;
+    }
+ 
+  
+  lcd.setCursor(juoksevaNumero, satunnainenNumero);
+  lcd.print("** ");
+  juoksevaNumero--;
+  delay(20);
+  
+  
+  
+  if(juoksevaNumero < 0){
+      juoksevaNumero = 19;
+      satunnainenNumero = random(4);
+      lcd.clear();
+      score++;
+
+    }
+  if(hahmoPaikkaY > 3){
+    hahmoPaikkaY = 0;
+    }
+  if(hahmoPaikkaY < 0){
+    hahmoPaikkaY = 3;
+    }
+    lcd.setCursor(hahmoPaikkaX, hahmoPaikkaY);
+    
+    lcd.print(":D");
+
+
+    lcd.setCursor(juoksevaNumero, satunnainenNumero);
+
+    
+    if(juoksevaNumero == hahmoPaikkaX){
+      if(satunnainenNumero == hahmoPaikkaY){
+        lcd.setCursor(hahmoPaikkaX, hahmoPaikkaY);
+        lcd.print(";(");
+        lcd.setCursor(10,2);
+        lcd.print("GAME OVER!");
+        lcd.setCursor(10,1);
+        lcd.print("score ");
+        lcd.setCursor(16,1);
+        lcd.print(score);
+        while(1);
+        
+        }
+      }
+
+
+   buttonStateLeft = digitalRead(gnd_btn);
+
+    
+      if (buttonStateLeft != lastButtonStateLeft){
+        if (buttonStateLeft == HIGH) {    
+        Serial.print('1');
+        lcd.clear();
+        delay(20);
+        hahmoPaikkaY--;
+
+
+     }}
+  
+   lastButtonStateLeft = buttonStateLeft;
+
+  
+  }
+}
+void ee(){
+  lcd.clear();
+  while(1){
+  lcd.setCursor(5,1);
+  lcd.print("Unfortunately ");
+  lcd.setCursor(5,2);
+  lcd.print("we are already " );
+  lcd.setCursor(5,3);
+  lcd.print("ahead! ");
+  }
+  }
+  
+  
