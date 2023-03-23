@@ -1,9 +1,9 @@
-#include <LiquidCrystal.h>
+#include <LiquidCrystal.h>                                        //including all the libraries needed
 #include <TimerOne.h>
 #include <Ethernet.h>
 #include <PubSubClient.h>
 #include <SPI.h>
-#define inTopic    "ICT1B_in_2020"                    // * MQTT channel where data are received 
+#define inTopic    "ICT1B_in_2020"                                // * MQTT channel where data are received 
 #define outTopic   "ICT1B_out_2020" 
 #define  mac_6    0x32 
 
@@ -12,13 +12,14 @@
 const int speed_pin = 2; //Pin for wind speed signal
 
 
-const int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3; //LCD display pins
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7);//Define the lcd display as "lcd" and the pins
-const int buttonPins[4] = {A0, A1, A2, A3};//Button pins for keypad inputs
+const int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3;         //LCD display pins
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);                        //Define the lcd display as "lcd" and the pins
+const int buttonPins[4] = {A0, A1, A2, A3};                       //Button pins for keypad inputs
 
 
 bool tm = false;
-int buttonState = 0; //Button state of keypad buttons
+int buttonState = 0;                                              //Button state of keypad buttons
+
 
 //These are for debouncing grounding button for analog input
 int gnd_btn = A5;
@@ -28,8 +29,8 @@ unsigned long lastDebounceTime = 0;
 short debounceDelay = 50;
 
 
-volatile int step_counter = 0; //Counter for rising edges of wind speed signal
-volatile int freq = 0; //Frequency of wind speed signal
+volatile int step_counter = 0;                                    //Counter for rising edges of wind speed signal
+volatile int freq = 0;                                            //Frequency of wind speed signal
 
 int wind_speed = 0;
 int sensor_value = 0;
@@ -51,7 +52,7 @@ PubSubClient client (server, 1883, callback, ethClient);
 
 
 
-static uint8_t mymac[6] = { 0x44,0x76,0x58,0x10,0x00,mac_6 }; //Mac address for ethernet module
+static uint8_t mymac[6] = { 0x44,0x76,0x58,0x10,0x00,mac_6 };      //Mac address for ethernet module
 
 void testmode();
 void Timer_int_routine();
@@ -98,21 +99,21 @@ void loop() {
       tm = true;
     }
     if (buttonState == LOW && buttonPins[i] == A3){
-      running_alphabet();
+      peli();
     }
 
     if (tm == true){
       testmode();
     }
     if (buttonState == LOW && buttonPins[i] == A1){
-      
-      peli();
+
+
     }
     if (buttonState == LOW && buttonPins[i] == A2){
       
-      ee();
+ 
     }
-  }
+ }
 
   
 
@@ -299,7 +300,6 @@ void running_alphabet(){//Surprise
   char alphabet = 65;
   const int MAX_ASCII = 122;
   int a = 0, b = 0;
-
   while (true){
     while (a < 20){
       if (alphabet == 123){
@@ -403,7 +403,7 @@ int lastButtonStateRight = 0;
   lcd.setCursor(juoksevaNumero, satunnainenNumero);
   lcd.print("** ");
   juoksevaNumero--;
-  delay(20);
+  delay(20);  //pelin nopeus pienempi luku = nopeampi peli!!!
   
   
   
@@ -435,13 +435,19 @@ int lastButtonStateRight = 0;
         lcd.setCursor(10,2);
         lcd.print("GAME OVER!");
         lcd.setCursor(10,1);
-        lcd.print("score ");
-        lcd.setCursor(16,1);
+        lcd.print("score: ");
+        lcd.setCursor(17,1);
         lcd.print(score);
-        while(1);
+        while(1){
+          for (int i = 0; i < 4; i++){
+    buttonState = digitalRead(buttonPins[i]);
+           if (buttonState == LOW && buttonPins[i] == A3){
+        running_alphabet();
+    }
+          }
         
-        }
-      }
+        }}}
+      
 
 
    buttonStateLeft = digitalRead(gnd_btn);
@@ -461,17 +467,5 @@ int lastButtonStateRight = 0;
 
   
   }
-}
-void ee(){
-  lcd.clear();
-  while(1){
-  lcd.setCursor(5,1);
-  lcd.print("Unfortunately ");
-  lcd.setCursor(5,2);
-  lcd.print("we are already " );
-  lcd.setCursor(5,3);
-  lcd.print("ahead! ");
-  }
-  }
-  
+} 
   
