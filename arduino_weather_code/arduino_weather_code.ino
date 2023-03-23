@@ -4,21 +4,21 @@
 #include <PubSubClient.h>
 #include <SPI.h>
 #define inTopic    "ICT1B_in_2020"                                // * MQTT channel where data are received 
-#define outTopic   "ICT1B_out_2020" 
-#define  mac_6    0x32 
+#define outTopic   "ICT4_out_2020" 
+#define  mac_6    0x69 
 
 
 
-const int speed_pin = 2; //Pin for wind speed signal
+const short int speed_pin = 2; //Pin for wind speed signal
 
 
-const int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3;         //LCD display pins
+const short int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3;         //LCD display pins
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);                        //Define the lcd display as "lcd" and the pins
-const int buttonPins[4] = {A0, A1, A2, A3};                       //Button pins for keypad inputs
+const short int buttonPins[4] = {A0, A1, A2, A3};                       //Button pins for keypad inputs
 
 
 bool tm = false;
-int buttonState = 0;                                              //Button state of keypad buttons
+short int buttonState = 0;                                              //Button state of keypad buttons
 
 
 //These are for debouncing grounding button for analog input
@@ -34,6 +34,10 @@ volatile int freq = 0;                                            //Frequency of
 
 int wind_speed = 0;
 int sensor_value = 0;
+int wind_deg = 0;
+
+bool dir_state = false;
+bool speed_state = false;
 
 
 
@@ -94,123 +98,131 @@ void loop() {
     buttonState = digitalRead(buttonPins[i]);
     
 
-    if (buttonState == LOW && buttonPins[i] == A0){
+    if (buttonState == LOW && buttonPins[i] == A0){ //Button 1
       
       tm = true;
     }
-    if (buttonState == LOW && buttonPins[i] == A3){
+    if (buttonState == LOW && buttonPins[i] == A3){ //Button A
       peli();
     }
 
     if (tm == true){
       testmode();
     }
-    if (buttonState == LOW && buttonPins[i] == A1){
-
+    if (buttonState == LOW && buttonPins[i] == A1){ //Button 2
+      if (dir_state){
+        dir_state = false;        
+      }
+      else{
+      dir_state = true;
+      }      
 
     }
-    if (buttonState == LOW && buttonPins[i] == A2){
-      
- 
+    if (buttonState == LOW && buttonPins[i] == A2){ //Button 3
+      if (speed_state){
+        speed_state = false;        
+      }
+      else{      
+      speed_state = true;
+      }
     }
  }
 
   
+  if (dir_state){ //Start measuring wind direction
+    wind_dir();
 
-  int gnd_reading = digitalRead(gnd_btn);
-
-  if (gnd_reading != gnd_state){
-    lastDebounceTime = millis();
   }
-  
-  //For grounding the analog input when there's no input to it
-  if((millis()- lastDebounceTime) > debounceDelay);  
-    if (gnd_state == 0){
-      if (gnd_reading == HIGH){
-        digitalWrite(gnd_output, HIGH);
-        gnd_state = 1;
-      }
-    }
-    else if (gnd_state == 1){
-      if (gnd_reading == HIGH){
-        digitalWrite(gnd_output, LOW);
-        gnd_state = 0;
-      }
-    }   
-  
-  
-  
-  lcd.setCursor(12,0);
-  lcd.print(wind_speed);
-  lcd.print(" m/s ");
-    
-  wind_dir();
-
-
-  send_MQTT_message();
+  else if(dir_state == false){
+    lcd.setCursor(3, 3);
+    lcd.print("DIR:OFF");
+    lcd.setCursor(11, 1);
+    lcd.print("  ");    
+  }
+      
+  if (speed_state){ //Start measuring wind speed 
+    lcd.setCursor(12, 0);
+    lcd.print(wind_speed);
+    lcd.print(" m/s ");
+    lcd.setCursor(12, 3);
+    lcd.print("SPD:ON ");
+  }
+  else if (speed_state == false){
+    lcd.setCursor(12, 3);
+    lcd.print("SPD:OFF");
+    lcd.setCursor(12, 0);
+    lcd.print("        ");
+  }
+  if(speed_state == true || dir_state == true){  
+    send_MQTT_message();
+  }
 
 }
 
 void wind_dir(){//Wind direction calculated here
+  lcd.setCursor(3, 3);
+  lcd.print("DIR:ON ");
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
-
+  
+  
   if(wind_direction >= 0 && wind_direction < 0.47){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 360;
     lcd.print("N ");
     delay(500);
   }
   else if(wind_direction > 0.47 && wind_direction < 0.95){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 45;
     lcd.print("NE");
     delay(500);
   }
   else if(wind_direction > 0.95 && wind_direction < 0.95){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 90;
     lcd.print("E ");
     delay(500);
   }
   else if(wind_direction > 1.43 && wind_direction < 1.9){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 135;
     lcd.print("SE");
     delay(500);
   }
   else if(wind_direction > 1.9 && wind_direction < 2.38){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 180;
     lcd.print("S ");
     delay(500);
   }
   else if(wind_direction > 2.38 && wind_direction < 2.85){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 225;
     lcd.print("SW");
     delay(500);
   }
   else if(wind_direction > 2.85 && wind_direction < 3.33){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 270;
     lcd.print("W ");
     delay(500);
   }
   else if(wind_direction > 3.33){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 315;
     lcd.print("NW");
     delay(500);
   }
+
 
 }
 
@@ -220,7 +232,7 @@ void testmode(){
   
   while(true){
     wind_speed = -0.24 + freq * 0.699;
-    lcd.setCursor(18, 3);
+    lcd.setCursor(0, 3);
     lcd.print("TM");
     
     lcd.setCursor(12, 0);
@@ -259,8 +271,8 @@ void fetch_IP(){ //Get ip address for ethernet module
     lcd.print("IP fail");
   }
   else{
-  lcd.setCursor(0,2);
-  lcd.print(Ethernet.localIP());
+    lcd.setCursor(0,2);
+    lcd.print(Ethernet.localIP());
   }
 }
 
@@ -269,28 +281,43 @@ void callback(char* topic, byte* payload, unsigned int length){
   byte received_payload = payload;
   unsigned int received_length = length;
 }
+
 void Connect_MQTT_server(){
   if (!client.connected()){                                   // check if allready connected  
       if (client.connect(clientId, deviceId, deviceSecret)){ // connection to MQTT server 
-        Serial.println(" Connected OK " );
+        
         client.subscribe(inTopic);                        // subscript to in topic        
       }
   }
 }
 
+
+
 void send_MQTT_message(){                     // Send MQTT message
-  char bufa[50];                             //  Print message to serial monitor
-  if (client.connected()){ 
-    sprintf(bufa,"Alykkaat MQTT: moi");               // create message with header and data
-    Serial.println( bufa ); 
-    client.publish(outTopic,bufa);                        // send message to MQTT server        
+  
+  char spd_bufa[50];
+  char dir_bufa[50];
+  if (client.connected() && speed_state == true){ 
+    sprintf(spd_bufa,"IOTJS={\"S_name\":\"Alykkaat wind speed\",\"S_value\":%d}",wind_speed);// create message with header and data
+    
+    client.publish(outTopic,spd_bufa);// send message to MQTT server        
   }
-  else{                                                           //   Re connect if connection is lost
+  if (client.connected() && dir_state == true){
+    sprintf(dir_bufa,"IOTJS={\"S_name\":\"Alykkaat wind degree \",\"S_value\":%d}",wind_deg);
+     
+    client.publish(outTopic,dir_bufa);
+  }
+ 
+  
+  else{//Re connect if connection is lost
     delay(500);
-    Serial.println("No, re-connecting" );
+    
     client.connect(clientId, deviceId, deviceSecret);
-    delay(1000);                                            // wait for reconnecting
+    delay(1000);// wait for reconnecting
   }
+
+  delay(1000);
+  
 }
 
 
@@ -371,16 +398,16 @@ void peli(){
 
   lcd.clear();
 
-int satunnainenNumero = 0; //random number for game
-int juoksevaNumero = 19; //number to get files moving
-int score = 0;
-int hahmoPaikkaY = 0;
-int hahmoPaikkaX = 0;
-int aloitus = 0;
-int buttonStateLeft = HIGH;        
-int buttonStateRight = HIGH;
-int lastButtonStateLeft = 0;
-int lastButtonStateRight = 0;
+  int satunnainenNumero = 0; //random number for game
+  int juoksevaNumero = 19; //number to get files moving
+  int score = 0;
+  int hahmoPaikkaY = 0;
+  int hahmoPaikkaX = 0;
+  int aloitus = 0;
+  int buttonStateLeft = HIGH;        
+  int buttonStateRight = HIGH;
+  int lastButtonStateLeft = 0;
+  int lastButtonStateRight = 0;
 
   while(true){
   
@@ -455,7 +482,7 @@ int lastButtonStateRight = 0;
     
       if (buttonStateLeft != lastButtonStateLeft){
         if (buttonStateLeft == HIGH) {    
-        Serial.print('1');
+        
         lcd.clear();
         delay(20);
         hahmoPaikkaY--;
