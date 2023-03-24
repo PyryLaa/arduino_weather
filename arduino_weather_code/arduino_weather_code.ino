@@ -164,61 +164,61 @@ void wind_dir(){//Wind direction calculated here
   lcd.print("DIR:ON ");
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
-  
+  wind_deg = 180;
   
   if(wind_direction >= 0 && wind_direction < 0.47){
     
     lcd.setCursor(11,1);
-    wind_deg = 360;
+    
     lcd.print("N ");
     delay(500);
   }
   else if(wind_direction > 0.47 && wind_direction < 0.95){
     
     lcd.setCursor(11,1);
-    wind_deg = 45;
+    
     lcd.print("NE");
     delay(500);
   }
   else if(wind_direction > 0.95 && wind_direction < 0.95){
     
     lcd.setCursor(11,1);
-    wind_deg = 90;
+    
     lcd.print("E ");
     delay(500);
   }
   else if(wind_direction > 1.43 && wind_direction < 1.9){
     
     lcd.setCursor(11,1);
-    wind_deg = 135;
+    
     lcd.print("SE");
     delay(500);
   }
   else if(wind_direction > 1.9 && wind_direction < 2.38){
     
     lcd.setCursor(11,1);
-    wind_deg = 180;
+    
     lcd.print("S ");
     delay(500);
   }
   else if(wind_direction > 2.38 && wind_direction < 2.85){
     
     lcd.setCursor(11,1);
-    wind_deg = 225;
+    
     lcd.print("SW");
     delay(500);
   }
   else if(wind_direction > 2.85 && wind_direction < 3.33){
     
     lcd.setCursor(11,1);
-    wind_deg = 270;
+    
     lcd.print("W ");
     delay(500);
   }
   else if(wind_direction > 3.33){
     
     lcd.setCursor(11,1);
-    wind_deg = 315;
+    
     lcd.print("NW");
     delay(500);
   }
@@ -295,19 +295,24 @@ void Connect_MQTT_server(){
 
 void send_MQTT_message(){                     // Send MQTT message
   
-  char spd_bufa[50];
-  char dir_bufa[50];
-  if (client.connected() && speed_state == true){ 
-    sprintf(spd_bufa,"IOTJS={\"S_name\":\"Alykkaat wind speed\",\"S_value\":%d}",wind_speed);// create message with header and data
+  char spd_bufa[100];
+  char dir_bufa[100];
+  char both_bufa[100];
+  if (client.connected() && speed_state == true && dir_state == false){ 
+    sprintf(spd_bufa,"IOTJS={\"S_name1\":\"Alykkaat wind speed\",\"S_value1\":%d}",wind_speed);// create message with header and data
     
     client.publish(outTopic,spd_bufa);// send message to MQTT server        
   }
-  if (client.connected() && dir_state == true){
-    sprintf(dir_bufa,"IOTJS={\"S_name\":\"Alykkaat wind degree \",\"S_value\":%d}",wind_deg);
+  else if (client.connected() && dir_state == true && speed_state == false){
+    sprintf(dir_bufa,"IOTJS={\"S_name1\":\"Alykkaat wind degree \",\"S_value1\":%d}",wind_deg);
      
     client.publish(outTopic,dir_bufa);
   }
- 
+  else if (client.connected() && dir_state == true && speed_state== true){
+    sprintf(both_bufa,"IOTJS={\"S_name1\":\"wind degree\",\"S_value1\":%d,\"S_name2\":\"Wind speed\",\"S_value2\":%d}",wind_deg, wind_speed);
+     
+    client.publish(outTopic,both_bufa);
+  }
   
   else{//Re connect if connection is lost
     delay(500);
