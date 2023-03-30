@@ -229,7 +229,7 @@ void testmode(){          //testmode for measuring wind speed and direction but 
   while(true){
     wind_speed = -0.24 + freq * 0.699;
     lcd.setCursor(0, 3);
-    lcd.print("TM");
+    lcd.print("TM                ");
     
     lcd.setCursor(12, 0);
     lcd.print(wind_speed);
