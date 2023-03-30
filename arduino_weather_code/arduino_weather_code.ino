@@ -1,3 +1,4 @@
+
 #include <LiquidCrystal.h>                                        //including all the libraries needed
 #include <TimerOne.h>
 #include <Ethernet.h>
@@ -12,13 +13,13 @@
 const short int speed_pin = 2; //Pin for wind speed signal
 
 
-const short int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3;         //LCD display pins
+const short int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 4, d7 = 3;   //LCD display pins
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);                        //Define the lcd display as "lcd" and the pins
-const short int buttonPins[4] = {A0, A1, A2, A3};                       //Button pins for keypad inputs
+const short int buttonPins[4] = {A0, A1, A2, A3};                 //Button pins for keypad inputs
 
 
 bool tm = false;
-short int buttonState = 0;                                              //Button state of keypad buttons
+short int buttonState = 0;                                        //Button state of keypad buttons
 
 
 //These are for debouncing grounding button for analog input
@@ -43,14 +44,14 @@ bool speed_state = false;
 
 
 EthernetClient ethClient;
-
+                                                                   //deviceid, clientid and password for connecting to mqtt server
 char* deviceId = "2023PJS420";
 char* clientId = "8481024";
 char* deviceSecret = "tamk";  
 
 
 
-byte server[] = {10, 6, 0, 21}; //Server IP address
+byte server[] = {10, 6, 0, 21};                                    //Server IP address
 void callback(char* topic, byte* payload, unsigned int length);
 PubSubClient client (server, 1883, callback, ethClient);
 
@@ -58,43 +59,38 @@ PubSubClient client (server, 1883, callback, ethClient);
 
 static uint8_t mymac[6] = { 0x44,0x76,0x58,0x10,0x00,mac_6 };      //Mac address for ethernet module
 
-void testmode();
-void Timer_int_routine();
-void pulse_counter();
-void Connect_MQTT_server();
-void send_MQTT_message();
 
 void setup() {
-  pinMode(9, OUTPUT);
-  pinMode(A5, INPUT);
+  
+  pinMode(A5, INPUT);                                              //input for a game
   attachInterrupt(digitalPinToInterrupt(2), pulse_counter, RISING);
   Timer1.initialize(3000000);
   Timer1.attachInterrupt(Timer_int_routine);
 
-  lcd.begin(20,4);
+  lcd.begin(20,4);                                                  //lcd ja serial monitor start, analog and digital signal pinmodes
   pinMode(speed_pin, INPUT);
   Serial.begin(9600);
   pinMode(A4, INPUT);
 
 
-  for (int i = 0; i < 4; i++){
+  for (int i = 0; i < 4; i++){                                      //for loop for pullingup keypad inputs
     pinMode(buttonPins[i], INPUT_PULLUP);
   };
-  lcd.setCursor(0, 0);
+  lcd.setCursor(0, 0);                                              //printing windspeed and direction to the lcd
   lcd.print("Wind speed: ");
   lcd.setCursor(0, 1);
   lcd.print("Direction: ");
 
-  fetch_IP();
+  fetch_IP();                                                       //fetching ip address
   
   
   
-  Connect_MQTT_server();
+  Connect_MQTT_server();                                            //connecting to mqtt server
   
 }
 
 void loop() {
-  for (int i = 0; i < 4; i++){
+  for (int i = 0; i < 4; i++){                                      //reading for button presses so that functions can be called
     buttonState = digitalRead(buttonPins[i]);
     
 
@@ -133,8 +129,8 @@ void loop() {
     wind_dir();
 
   }
-  else if(dir_state == false){
-    lcd.setCursor(3, 3);
+  else if(dir_state == false){    //printing dir:off if the wind direction is set to off
+    lcd.setCursor(3, 3);    
     lcd.print("DIR:OFF");
     lcd.setCursor(11, 1);
     lcd.print("  ");    
@@ -147,26 +143,26 @@ void loop() {
     lcd.setCursor(12, 3);
     lcd.print("SPD:ON ");
   }
-  else if (speed_state == false){
+  else if (speed_state == false){   //printing spd:off if the wind speed is set to off
     lcd.setCursor(12, 3);
     lcd.print("SPD:OFF");
     lcd.setCursor(12, 0);
     lcd.print("        ");
   }
-  if(speed_state == true || dir_state == true){  
+  if(speed_state == true || dir_state == true){         //if both measurements are set to on the board uses this to send a message
     send_MQTT_message();
   }
 
 }
 
-void wind_dir(){//Wind direction calculated here
+void wind_dir(){//Wind direction calculated here and printed on the lcd
   lcd.setCursor(3, 3);
   lcd.print("DIR:ON ");
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
   
   
-  if(wind_direction >= 0 && wind_direction < 0.47){
+  if(wind_direction >= 0 && wind_direction < 0.47){     //checking that in wich direction the wind is blowing and printing it on the lcs accordingly
     
     lcd.setCursor(11,1);
     wind_deg = 0;
@@ -227,7 +223,7 @@ void wind_dir(){//Wind direction calculated here
 }
 
 
-void testmode(){
+void testmode(){          //testmode for measuring wind speed and direction but not sending it to mqtt
 
   
   while(true){
@@ -266,12 +262,12 @@ void fetch_IP(){ //Get ip address for ethernet module
   byte result = 1;
 
   result = Ethernet.begin( mymac);
-  if (result == 0){
+  if (result == 0){                   //if finding ip addess fails this prints ip fail
     lcd.setCursor(0,2);
     lcd.print("IP fail");
   }
   else{
-    lcd.setCursor(0,2);
+    lcd.setCursor(0,2);              //printing ip if found
     lcd.print(Ethernet.localIP());
   }
 }
@@ -298,20 +294,22 @@ void send_MQTT_message(){                     // Send MQTT message
   char spd_bufa[100];
   char dir_bufa[100];
   char both_bufa[100];
-  if (client.connected() && speed_state == true && dir_state == false){ 
+  if (client.connected() && speed_state == true && dir_state == false){         //creating message according to measured values
     sprintf(spd_bufa,"IOTJS={\"S_name1\":\"Alykkaat wind speed\",\"S_value1\":%d}",wind_speed);// create message with header and data
     
     client.publish(outTopic,spd_bufa);// send message to MQTT server        
   }
-  else if (client.connected() && dir_state == true && speed_state == false){
-    sprintf(dir_bufa,"IOTJS={\"S_name1\":\"Alykkaat wind degree \",\"S_value1\":%d}",wind_deg);
+  else if (client.connected() && dir_state == true && speed_state == false){          //creating message according to measured values
+    sprintf(dir_bufa,"IOTJS={\"S_name1\":\"Alykkaat wind degree \",\"S_value1\":%d}",wind_deg);// create message with header and data
+    
      
     client.publish(outTopic,dir_bufa);
   }
-  else if (client.connected() && dir_state == true && speed_state== true){
-    sprintf(both_bufa,"IOTJS={\"S_name1\":\"wind degree\",\"S_value1\":%d,\"S_name2\":\"Wind speed\",\"S_value2\":%d}",wind_deg, wind_speed);
+  else if (client.connected() && dir_state == true && speed_state== true){         //creating message according to measured values
+    sprintf(both_bufa,"IOTJS={\"S_name1\":\"wind degree\",\"S_value1\":%d,\"S_name2\":\"Wind speed\",\"S_value2\":%d}",wind_deg, wind_speed);// create message with header and data
+    
      
-    client.publish(outTopic,both_bufa);
+    client.publish(outTopic,both_bufa);           //publishing the message
   }
   
   else{//Re connect if connection is lost
@@ -328,7 +326,7 @@ void send_MQTT_message(){                     // Send MQTT message
 
 
 
-void running_alphabet(){//Surprise
+void running_alphabet(){            //fun suprise easter egg
   char alphabet = 65;
   const int MAX_ASCII = 122;
   int a = 0, b = 0;
@@ -399,12 +397,12 @@ void running_alphabet(){//Surprise
 
 }
 
-void peli(){
+void peli(){              //fun game easter egg
 
   lcd.clear();
 
-  int satunnainenNumero = 0; //random number for game
-  int juoksevaNumero = 19; //number to get files moving
+  int satunnainenNumero = 0;
+  int juoksevaNumero = 19; 
   int score = 0;
   int hahmoPaikkaY = 0;
   int hahmoPaikkaX = 0;
@@ -479,25 +477,3 @@ void peli(){
           }
         
         }}}
-      
-
-
-   buttonStateLeft = digitalRead(gnd_btn);
-
-    
-      if (buttonStateLeft != lastButtonStateLeft){
-        if (buttonStateLeft == HIGH) {    
-        
-        lcd.clear();
-        delay(20);
-        hahmoPaikkaY--;
-
-
-     }}
-  
-   lastButtonStateLeft = buttonStateLeft;
-
-  
-  }
-} 
-  
