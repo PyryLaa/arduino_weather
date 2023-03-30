@@ -1,4 +1,3 @@
-
 #include <LiquidCrystal.h>                                        //including all the libraries needed
 #include <TimerOne.h>
 #include <Ethernet.h>
@@ -157,7 +156,9 @@ void loop() {
 
 void wind_dir(){//Wind direction calculated here and printed on the lcd
   lcd.setCursor(3, 3);
+  if(!tm){
   lcd.print("DIR:ON ");
+  }
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
   
@@ -229,7 +230,7 @@ void testmode(){          //testmode for measuring wind speed and direction but 
   while(true){
     wind_speed = -0.24 + freq * 0.699;
     lcd.setCursor(0, 3);
-    lcd.print("TM                ");
+    lcd.print("TM                  ");
     
     lcd.setCursor(12, 0);
     lcd.print(wind_speed);
@@ -477,3 +478,24 @@ void peli(){              //fun game easter egg
           }
         
         }}}
+      
+
+
+   buttonStateLeft = digitalRead(gnd_btn);
+
+    
+      if (buttonStateLeft != lastButtonStateLeft){
+        if (buttonStateLeft == HIGH) {    
+        
+        lcd.clear();
+        delay(20);
+        hahmoPaikkaY--;
+
+
+     }}
+  
+   lastButtonStateLeft = buttonStateLeft;
+
+  
+  }
+} 
