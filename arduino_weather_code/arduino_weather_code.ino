@@ -164,61 +164,61 @@ void wind_dir(){//Wind direction calculated here
   lcd.print("DIR:ON ");
   sensor_value = analogRead(A4);
   float wind_direction = sensor_value*(5/1023.0);
-  wind_deg = 180;
+  
   
   if(wind_direction >= 0 && wind_direction < 0.47){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 0;
     lcd.print("N ");
     delay(500);
   }
   else if(wind_direction > 0.47 && wind_direction < 0.95){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 45;
     lcd.print("NE");
     delay(500);
   }
   else if(wind_direction > 0.95 && wind_direction < 0.95){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 90;
     lcd.print("E ");
     delay(500);
   }
   else if(wind_direction > 1.43 && wind_direction < 1.9){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 135;
     lcd.print("SE");
     delay(500);
   }
   else if(wind_direction > 1.9 && wind_direction < 2.38){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 180;
     lcd.print("S ");
     delay(500);
   }
   else if(wind_direction > 2.38 && wind_direction < 2.85){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 225;
     lcd.print("SW");
     delay(500);
   }
   else if(wind_direction > 2.85 && wind_direction < 3.33){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 270;
     lcd.print("W ");
     delay(500);
   }
   else if(wind_direction > 3.33){
     
     lcd.setCursor(11,1);
-    
+    wind_deg = 315;
     lcd.print("NW");
     delay(500);
   }
